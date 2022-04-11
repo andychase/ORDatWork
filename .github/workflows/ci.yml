@@ -1,0 +1,24 @@
+on: [push]
+name: Tests
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: drupal:php7.4
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          fetch-depth: 1
+
+      - name: Build project
+        run: |
+          apt-get update
+          apt-get install -y nodejs npm
+          npm install -g codedown
+      - name: Run install script
+        run: |
+          echo "memory_limit = -1;" > /usr/local/etc/php/conf.d/mem-limit.ini
+          composer self-update --1
+          cat auto-install.sh.md | codedown bash > auto-install.sh
+          bash auto-install.sh -y
